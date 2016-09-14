@@ -4,3 +4,5 @@ var config = {
         password: 'password123test'
     }
 };
+
+module.exports = config;
