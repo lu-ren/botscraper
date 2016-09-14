@@ -1,0 +1,25 @@
+{
+  "name": "botscaper",
+  "version": "1.0.0",
+  "description": "Scrapes websites",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lu-ren/botscraper.git"
+  },
+  "keywords": [
+    "scraper"
+  ],
+  "author": "notabot",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lu-ren/botscraper/issues"
+  },
+  "homepage": "https://github.com/lu-ren/botscraper#readme",
+  "dependencies": {
+    "casperjs": "^1.1.3"
+  }
+}
