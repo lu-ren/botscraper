@@ -49,17 +49,22 @@ var scrape = function(url) {
 
     //Should be logged in at this point
     casper.then(function() {
-        this.evaluate(function() {
-            var children = $('.companies-using-service').children();
-            var counter = 0;
+        var counter = 0;
+        var cap = 500;
 
-            while (counter < children.length) {
-                var child = children[counter];
-                console.log($(child).find('a').attr('data-hint'));
-                counter++;
-            }
-        });
+        while (this.exists('#service-stacks-load-more'))
+            this.evaluate(scrapeClients, counter);
     });
 };
+
+var scrapeClients = function(counter) {
+    var children = $('.companies-using-service').children();
+
+    while (counter < children.length) {
+        child = children[counter];
+        console.log($(child).find('a').attr('data-hint'));
+        counter++;
+    }
+}
 
 module.exports = scrape;
