@@ -52,8 +52,16 @@ var scrape = function(url) {
         var counter = 0;
         var cap = 500;
 
-        while (this.exists('#service-stacks-load-more'))
-            this.evaluate(scrapeClients, counter);
+        var clickHelper = function() {
+            counter = casper.evaluate(scrapeClients, counter);
+
+            if (casper.exists('#service-stacks-load-more') && counter < cap) {
+                casper.clickLabel('See more stacks', 'a');
+                casper.then(clickHelper);
+            }
+        };
+
+        clickHelper();
     });
 };
 
@@ -65,6 +73,7 @@ var scrapeClients = function(counter) {
         console.log($(child).find('a').attr('data-hint'));
         counter++;
     }
+    return counter;
 }
 
 module.exports = scrape;
