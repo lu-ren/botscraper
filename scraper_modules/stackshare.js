@@ -24,17 +24,23 @@ var scrape = function(url) {
                     console.log('Site ', url, ' failed with status ', response.status);
                     this.exit();
                 }
+
                 var credentials = require('../config').github;
+
                 this.waitForSelector('form', function() {
                     this.fillSelectors('form', {
                         'input[name = login]': credentials.username,
                         'input[name = password]': credentials.password
                     }, true);
                 });
-                this.then(function() {
+
+                this.waitForSelector('.dropdown-toggle', function() {
                     var cookies = JSON.stringify(phantom.cookies);
                     fs.write('cookies.json', cookies, 644);
-                })
+                    fs.write('test.html', this.getHTML(), 'w');
+                    console.log('Successfully authenticated. Saving cookies...');
+                });
+
             });
         } else {
             console.log('Already logged in');
