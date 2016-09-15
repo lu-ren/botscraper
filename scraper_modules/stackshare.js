@@ -39,12 +39,26 @@ var scrape = function(url) {
                     fs.write('cookies.json', cookies, 644);
                     fs.write('test.html', this.getHTML(), 'w');
                     console.log('Successfully authenticated. Saving cookies...');
+                    this.open(url);
                 });
-
             });
         } else {
             console.log('Already logged in');
         }
+    });
+
+    //Should be logged in at this point
+    casper.then(function() {
+        this.evaluate(function() {
+            var children = $('.companies-using-service').children();
+            var counter = 0;
+
+            while (counter < children.length) {
+                var child = children[counter];
+                console.log($(child).find('a').attr('data-hint'));
+                counter++;
+            }
+        });
     });
 };
 
