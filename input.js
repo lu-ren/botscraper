@@ -1,3 +1,9 @@
+var sites = {
+    stackshare: {
+        baseUrl: 'http://stackshare.io'
+    }
+};
+
 var targets = [
     {
         name: 'adroll',
@@ -5,4 +11,5 @@ var targets = [
     }
 ];
 
-module.exports = targets;
+exports.sites = sites;
+exports.targets = targets;

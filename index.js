@@ -8,7 +8,7 @@ global.casper = require('casper').create({
         }
     }),
     config = require('./config'),
-    targets = require('./input'),
+    targets = require('./input').targets,
     stackshare_mod = require('./scraper_modules/stackshare.js');
 
 casper.on('error', function(msg, backtrace) {
@@ -33,7 +33,16 @@ casper.on('remote.message', function(msg) {
 });
 
 casper.start().then(function() {
-    this.echo('Starting botscraper... o<[0__0]>o')
+    var fs = require('fs');
+    this.echo('Starting botscraper... o<[0__0]>o');
+
+    if (fs.isFile('cookies.json')) {
+        this.echo('Restoring cookies...');
+        var data = fs.read('cookies.json');
+        phantom.cookies = JSON.parse(data);
+    } else {
+        this.echo('Cookies do not exist');
+    }
 });
 
 //Stackshare pipe
