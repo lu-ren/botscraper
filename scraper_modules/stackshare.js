@@ -51,9 +51,12 @@ var scrape = function(url) {
     casper.then(function() {
         var counter = 0;
         var cap = 500;
+        var names = [];
 
         var clickHelper = function() {
-            counter = casper.evaluate(scrapeClients, counter);
+            var ret = casper.evaluate(scrapeClients, counter);
+            counter = ret.counter;
+            names = names.concat(ret.names);
 
             if (casper.exists('#service-stacks-load-more') && counter < cap) {
                 casper.clickLabel('See more stacks', 'a');
@@ -62,18 +65,32 @@ var scrape = function(url) {
         };
 
         clickHelper();
+
+        casper.then(function() {
+            var f = fs.open('names.txt', 'w');
+
+            names.forEach(function(name) {
+                f.write(name + '\n');
+            });
+            f.close();
+        })
     });
 };
 
 var scrapeClients = function(counter) {
     var children = $('.companies-using-service').children();
+    var names = [];
 
     while (counter < children.length) {
         child = children[counter];
-        console.log($(child).find('a').attr('data-hint'));
+        var name = $(child).find('a').attr('data-hint');
+        names.push(name);
         counter++;
     }
-    return counter;
+    return {
+        counter: counter,
+        names: names
+    };
 }
 
 module.exports = scrape;
