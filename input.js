@@ -1,15 +1,17 @@
 var sites = {
     stackshare: {
         baseUrl: 'http://stackshare.io'
+    },
+    siftery: {
+        baseUrl: 'http://siftery.com'
     }
 };
 
-var targets = [
-    {
-        name: 'adroll',
-        stackshare: 'http://stackshare.io/adroll/in-stacks#'
-    }
-];
+var target =
+{
+    name: 'adroll',
+    stackshare: 'http://stackshare.io/adroll/in-stacks#'
+};
 
 exports.sites = sites;
-exports.targets = targets;
+exports.target = target;

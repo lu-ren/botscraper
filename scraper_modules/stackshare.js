@@ -3,7 +3,7 @@ var fs = require('fs'),
 
 var scrape = function(url) {
     casper.thenOpen(url, function(response) {
-        if (response == undefined || response.status >= 400) {
+        if (response === undefined || response.status >= 400) {
             console.log('Site ', url, ' failed with status ', response.status);
             this.exit();
         } else {
@@ -20,7 +20,7 @@ var scrape = function(url) {
             var authUrl = baseUrl + authRoute;
 
             this.thenOpen(authUrl, function(response) {
-                if (response == undefined || response.status >= 400) {
+                if (response === undefined || response.status >= 400) {
                     console.log('Site ', url, ' failed with status ', response.status);
                     this.exit();
                 }
@@ -37,7 +37,6 @@ var scrape = function(url) {
                 this.waitForSelector('.dropdown-toggle', function() {
                     var cookies = JSON.stringify(phantom.cookies);
                     fs.write('cookies.json', cookies, 644);
-                    fs.write('test.html', this.getHTML(), 'w');
                     console.log('Successfully authenticated. Saving cookies...');
                     this.open(url);
                 });
@@ -67,13 +66,8 @@ var scrape = function(url) {
         clickHelper();
 
         casper.then(function() {
-            var f = fs.open('names.txt', 'w');
-
-            names.forEach(function(name) {
-                f.write(name + '\n');
-            });
-            f.close();
-        })
+            struct.clients = names;
+        });
     });
 };
 
@@ -91,6 +85,6 @@ var scrapeClients = function(counter) {
         counter: counter,
         names: names
     };
-}
+};
 
 module.exports = scrape;

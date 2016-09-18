@@ -7,9 +7,10 @@ global.casper = require('casper').create({
              userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_5) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4'
         }
     }),
-    config = require('./config'),
-    targets = require('./input').targets,
-    stackshare_mod = require('./scraper_modules/stackshare.js');
+    global.struct = require('./models/struct'),
+    target = require('./input').target,
+    stackshare_mod = require('./scraper_modules/stackshare'),
+    siftery_mod = require('./scraper_modules/siftery');
 
 casper.on('error', function(msg, backtrace) {
   this.echo("=========================");
@@ -34,7 +35,7 @@ casper.on('remote.message', function(msg) {
 
 casper.start().then(function() {
     var fs = require('fs');
-    this.echo('Starting botscraper... o<[0__0]>o');
+    this.echo('Starting Mister Sifter... o<[0~_~0]>o');
 
     if (fs.isFile('cookies.json')) {
         this.echo('Restoring cookies...');
@@ -47,12 +48,17 @@ casper.start().then(function() {
 
 //Stackshare pipe
 casper.then(function() {
-    targets.forEach(function(target) {
-        return stackshare_mod(target.stackshare);
-    });
+    struct.target = target.name;
+    stackshare_mod(target.stackshare);
+});
+
+//Siftery pipe
+casper.then(function() {
+    siftery_mod();
 });
 
 casper.run(function() {
-    this.echo('------Finished-------\n');
+    this.echo('------Finished-------');
+    this.echo('Mister Sifter bids you goodbye...0<[0~_~0]>0');
     this.exit();
 });
