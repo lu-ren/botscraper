@@ -12,31 +12,33 @@ var scrape = function(url) {
     });
 
     casper.then(function() {
+        var self = this;
+
         //Need to login
-        if (this.exists('#more-stacks-login')) {
+        if (self.exists('#more-stacks-login')) {
             console.log('Not logged in. Logging in...');
             var baseUrl = sites.stackshare.baseUrl;
             var authRoute = '/users/auth/github';
             var authUrl = baseUrl + authRoute;
 
-            this.thenOpen(authUrl, function(response) {
+            self.thenOpen(authUrl, function(response) {
                 if (response === undefined || response.status >= 400) {
                     console.log('Site ', url, ' failed with status ', response.status);
-                    this.exit();
+                    self.exit();
                 }
 
                 var credentials = require('../config').github;
 
-                this.waitForSelector('form', function() {
-                    this.fillSelectors('form', {
+                self.waitForSelector('form', function() {
+                    self.fillSelectors('form', {
                         'input[name = login]': credentials.username,
                         'input[name = password]': credentials.password
                     }, true);
                 });
 
-                this.waitForSelector('.dropdown-toggle', function() {
+                self.waitForSelector('.dropdown-toggle', function() {
                     console.log('Successfully authenticated.');
-                    this.open(url);
+                    self.open(url);
                 });
             });
         } else {
@@ -46,24 +48,25 @@ var scrape = function(url) {
 
     //Should be logged in at this point
     casper.then(function() {
+        var self = this;
         var counter = 0;
         var cap = 500;
         var names = [];
 
         var clickHelper = function() {
-            var ret = casper.evaluate(scrapeClients, counter);
+            var ret = self.evaluate(scrapeClients, counter);
             counter = ret.counter;
             names = names.concat(ret.names);
 
-            if (casper.exists('#service-stacks-load-more') && counter < cap) {
-                casper.clickLabel('See more stacks', 'a');
-                casper.then(clickHelper);
+            if (self.exists('#service-stacks-load-more') && counter < cap) {
+                self.clickLabel('See more stacks', 'a');
+                self.then(clickHelper);
             }
         };
 
         clickHelper();
 
-        casper.then(function() {
+        self.then(function() {
             struct.clients = names;
         });
     });

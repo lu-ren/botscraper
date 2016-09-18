@@ -5,34 +5,36 @@ var scrape = function() {
     var url = sites.siftery.baseUrl;
 
     casper.thenOpen(url + '/users/login', function(response) {
+        var self = this;
+
         if (response === undefined || response.status >= 400) {
             console.log('Site ', url, ' failed with status ', response.status);
-            this.exit();
+            self.exit();
         } else {
             console.log('Opened ', url, ' successfully. Starting to scrape...');
         }
 
         //Somehow, the cookies do not work for siftery
         //Therefore, we will not save the cookies
-        if (this.exists('.login-form')) {
-            this.capture('test.png');
+        if (self.exists('.login-form')) {
+            self.capture('test.png');
             console.log('Not logged in. Logging in...');
             var credentials = require('../config').siftery;
 
-            this.waitForSelector('form', function() {
-                this.fillSelectors('form', {
+            self.waitForSelector('form', function() {
+                self.fillSelectors('form', {
                     'input[name = loginEmail]': credentials.username
                 });
             });
 
-            this.waitForSelector('input[type = password]', function() {
-                this.fillSelectors('form', {
+            self.waitForSelector('input[type = password]', function() {
+                self.fillSelectors('form', {
                     'input[type = password]': credentials.password
                 });
-                this.click('button[type = submit]');
+                self.click('button[type = submit]');
             });
 
-            this.waitForSelector('.user-dropdown', function() {
+            self.waitForSelector('.user-dropdown', function() {
                 console.log('Successfully authenticated.');
             });
         } else {
@@ -41,23 +43,42 @@ var scrape = function() {
     });
 
     casper.then(function() {
+        var self = this;
         var tmp = {};
-        //tmp.clients = ['SeamlessDocs'];
-        struct.clients.forEach(function(client) {
+        tmp.clients = ['SeamlessDocs'];
+
+        tmp.clients.forEach(function(client, index, lst) {
             var query = url + '/search?q=' + cleanName(client);
 
-            casper.thenOpen(query, function(response) {
+            self.thenOpen(query, function(response) {
                 if (response === undefined || response.status >= 400) {
                     console.log('Site ', query, ' failed with status ', response.status);
                     this.exit();
-                } else {
-                    console.log('Opened ', query, ' successfully. Starting to scrape...');
                 }
 
-                if (this.exists('.list-group')) {
+                if (this.exists(
+                            {
+                                type: 'xpath',
+                                path: '//*[@id="companies"]/ul/li/a/div[2]/h5'
+                            }
+                    )) {
                     console.log('Company ' + client + ' exists');
+                    var href = self.getElementAttribute(
+                                {
+                                    type: 'xpath',
+                                    path: '//*[@id="companies"]/ul/li/a'
+                                }, 'href');
+                    var clientUrl = url + href;
+                    self.thenOpen(clientUrl, function(response) {
+                        if (response === undefined || response.status >= 400) {
+                            console.log('Site ', clientUrl, ' failed with status ', response.status);
+                            this.exit();
+                        }
+                        console.log('Scraping ', clientUrl);
+                    });
                 } else {
                     console.log('Company ' + client + ' does not exist');
+                    lst.splice(index, 1);
                 }
             });
         });
