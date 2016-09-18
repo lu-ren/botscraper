@@ -41,9 +41,25 @@ var scrape = function() {
     });
 
     casper.then(function() {
+        var tmp = {};
+        //tmp.clients = ['SeamlessDocs'];
         struct.clients.forEach(function(client) {
-            var query = cleanName(client);
-            console.log(query);
+            var query = url + '/search?q=' + cleanName(client);
+
+            casper.thenOpen(query, function(response) {
+                if (response === undefined || response.status >= 400) {
+                    console.log('Site ', query, ' failed with status ', response.status);
+                    this.exit();
+                } else {
+                    console.log('Opened ', query, ' successfully. Starting to scrape...');
+                }
+
+                if (this.exists('.list-group')) {
+                    console.log('Company ' + client + ' exists');
+                } else {
+                    console.log('Company ' + client + ' does not exist');
+                }
+            });
         });
     });
 };

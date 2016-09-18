@@ -35,9 +35,7 @@ var scrape = function(url) {
                 });
 
                 this.waitForSelector('.dropdown-toggle', function() {
-                    var cookies = JSON.stringify(phantom.cookies);
-                    fs.write('cookies.json', cookies, 644);
-                    console.log('Successfully authenticated. Saving cookies...');
+                    console.log('Successfully authenticated.');
                     this.open(url);
                 });
             });

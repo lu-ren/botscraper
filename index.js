@@ -36,14 +36,6 @@ casper.on('remote.message', function(msg) {
 casper.start().then(function() {
     var fs = require('fs');
     this.echo('Starting Mister Sifter... o<[0~_~0]>o');
-
-    if (fs.isFile('cookies.json')) {
-        this.echo('Restoring cookies...');
-        var data = fs.read('cookies.json');
-        phantom.cookies = JSON.parse(data);
-    } else {
-        this.echo('Cookies do not exist');
-    }
 });
 
 //Stackshare pipe
