@@ -17,7 +17,6 @@ var scrape = function() {
         //Somehow, the cookies do not work for siftery
         //Therefore, we will not save the cookies
         if (self.exists('.login-form')) {
-            self.capture('test.png');
             console.log('Not logged in. Logging in...');
             var credentials = require('../config').siftery;
 
@@ -45,41 +44,46 @@ var scrape = function() {
     casper.then(function() {
         var self = this;
         var tmp = {};
-        tmp.clients = ['SeamlessDocs'];
+        tmp.clients = ['HootSuite'];
 
         tmp.clients.forEach(function(client, index, lst) {
             var query = url + '/search?q=' + cleanName(client);
 
             self.thenOpen(query, function(response) {
+                console.log(query);
                 if (response === undefined || response.status >= 400) {
                     console.log('Site ', query, ' failed with status ', response.status);
-                    this.exit();
+                    self.exit();
                 }
-
-                if (this.exists(
-                            {
-                                type: 'xpath',
-                                path: '//*[@id="companies"]/ul/li/a/div[2]/h5'
-                            }
-                    )) {
-                    console.log('Company ' + client + ' exists');
-                    var href = self.getElementAttribute(
+                //Wait for 2 seconds since website is shit and 
+                //gives empty results for a few seconds
+                self.wait(2000, function() {
+                    if (self.exists(
                                 {
                                     type: 'xpath',
                                     path: '//*[@id="companies"]/ul/li/a'
-                                }, 'href');
-                    var clientUrl = url + href;
-                    self.thenOpen(clientUrl, function(response) {
-                        if (response === undefined || response.status >= 400) {
-                            console.log('Site ', clientUrl, ' failed with status ', response.status);
-                            this.exit();
-                        }
-                        console.log('Scraping ', clientUrl);
-                    });
-                } else {
-                    console.log('Company ' + client + ' does not exist');
-                    lst.splice(index, 1);
-                }
+                                }
+                        )) {
+                        console.log('Company ' + client + ' exists');
+                        var href = self.getElementAttribute(
+                                    {
+                                        type: 'xpath',
+                                        path: '//*[@id="companies"]/ul/li/a'
+                                    }, 'href');
+                        var clientUrl = url + href;
+                        self.thenOpen(clientUrl, function(response) {
+                            if (response === undefined || response.status >= 400) {
+                                console.log('Site ', clientUrl, ' failed with status ', response.status);
+                                self.exit();
+                            }
+                            console.log('Scraping ', clientUrl);
+                            self.evaluate(scrapeClient);
+                        });
+                    } else {
+                        console.log('Company ' + client + ' does not exist');
+                        lst.splice(index, 1);
+                    }
+                });
             });
         });
     });
@@ -89,8 +93,21 @@ var scrape = function() {
 //Lowercases the names and replaces spaces with pluses
 var cleanName = function(name) {
     var replaced = name.split(' ').join('+');
-    replaced = replaced.toLowerCase();
     return replaced;
+};
+
+var scrapeClient = function() {
+    var ret = [];
+
+    //var children = $('.fluid-section-body__inner').children();
+    //console.log(children);
+    //children.forEach(function(child) {
+        //console.log(child);
+        //var elem = $(child).find('h3');
+        //console.log(elem.length);
+        //console.log($(child).find('h3').text());
+    //});
+    return ret;
 };
 
 module.exports = scrape;

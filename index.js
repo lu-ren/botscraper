@@ -39,10 +39,10 @@ casper.start().then(function() {
 });
 
 //Stackshare pipe
-casper.then(function() {
-    struct.target = target.name;
-    stackshare_mod(target.stackshare);
-});
+//casper.then(function() {
+    //struct.target = target.name;
+    //stackshare_mod(target.stackshare);
+//});
 
 //Siftery pipe
 casper.then(function() {

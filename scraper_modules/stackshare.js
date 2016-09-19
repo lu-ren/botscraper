@@ -28,6 +28,7 @@ var scrape = function(url) {
                 }
 
                 var credentials = require('../config').github;
+                self.capture('test.png');
 
                 self.waitForSelector('form', function() {
                     self.fillSelectors('form', {
