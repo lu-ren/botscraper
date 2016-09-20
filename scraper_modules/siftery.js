@@ -43,14 +43,12 @@ var scrape = function() {
 
     casper.then(function() {
         var self = this;
-        var tmp = {};
-        tmp.clients = ['HootSuite'];
 
-        tmp.clients.forEach(function(client, index, lst) {
+        struct.clients.forEach(function(client, index, lst) {
             var query = url + '/search?q=' + cleanName(client);
 
             self.thenOpen(query, function(response) {
-                console.log(query);
+                console.log('Querying ', query);
                 if (response === undefined || response.status >= 400) {
                     console.log('Site ', query, ' failed with status ', response.status);
                     self.exit();
@@ -77,11 +75,14 @@ var scrape = function() {
                                 self.exit();
                             }
                             console.log('Scraping ', clientUrl);
-                            self.evaluate(scrapeClient);
+
+                            self.waitForSelector('.products-bucket', function() {
+                                var softwares = self.evaluate(scrapeClient);
+                                writeToCSV(client, softwares);
+                            });
                         });
                     } else {
                         console.log('Company ' + client + ' does not exist');
-                        lst.splice(index, 1);
                     }
                 });
             });
@@ -96,17 +97,43 @@ var cleanName = function(name) {
     return replaced;
 };
 
+var writeToCSV = function(client, softwares) {
+    var filename = struct.target + '.csv';
+    var string = client;
+
+    softwares.forEach(function(sectionObj) {
+        var section = sectionObj.name;
+
+        sectionObj.softwares.forEach(function(software) {
+            string = string + ', ' + software + ' [ ' + section + ' ]';
+        });
+    });
+
+    fs.write(filename, string, 'a');
+};
+
+//This is causing a crash
 var scrapeClient = function() {
     var ret = [];
 
-    //var children = $('.fluid-section-body__inner').children();
-    //console.log(children);
-    //children.forEach(function(child) {
-        //console.log(child);
-        //var elem = $(child).find('h3');
-        //console.log(elem.length);
-        //console.log($(child).find('h3').text());
-    //});
+    var sections = $('.fluid-section-body__inner').children();
+
+    $(sections).each(function() {
+        var elem = $(this).find('.unit-group-title');
+        var section = {};
+        section.name = $(elem).text();
+        section.softwares = [];
+        var cells = $(this).find('.cell-item');
+
+        $(cells).each(function() {
+            var nameElem = $(this).find('.product-badge__title');
+            var text = $(nameElem).text();
+
+            if (text !== undefined)
+                section.softwares.push(text);
+        });
+        ret.push(section);
+    });
     return ret;
 };
 

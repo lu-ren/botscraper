@@ -51,7 +51,7 @@ var scrape = function(url) {
     casper.then(function() {
         var self = this;
         var counter = 0;
-        var cap = 500;
+        var cap = 100;
         var names = [];
 
         var clickHelper = function() {

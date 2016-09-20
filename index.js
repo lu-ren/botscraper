@@ -7,10 +7,11 @@ global.casper = require('casper').create({
              userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_5) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4'
         }
     }),
-    global.struct = require('./models/struct'),
     target = require('./input').target,
     stackshare_mod = require('./scraper_modules/stackshare'),
     siftery_mod = require('./scraper_modules/siftery');
+
+global.struct = {};
 
 casper.on('error', function(msg, backtrace) {
   this.echo("=========================");
@@ -39,13 +40,16 @@ casper.start().then(function() {
 });
 
 //Stackshare pipe
-//casper.then(function() {
-    //struct.target = target.name;
-    //stackshare_mod(target.stackshare);
-//});
+casper.then(function() {
+    struct.target = target.name;
+    struct.clients = [];
+    console.log('Starting stackshare pipe');
+    stackshare_mod(target.stackshare);
+});
 
 //Siftery pipe
 casper.then(function() {
+    console.log('Starting siftery pipe');
     siftery_mod();
 });
 
