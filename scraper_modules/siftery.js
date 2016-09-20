@@ -79,6 +79,8 @@ var scrape = function() {
                             self.waitForSelector('.products-bucket', function() {
                                 var softwares = self.evaluate(scrapeClient);
                                 writeToCSV(client, softwares);
+                            }, function() {
+                                console.log('Unable to scrape', clientUrl);
                             });
                         });
                     } else {

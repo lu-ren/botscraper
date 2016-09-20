@@ -1,17 +1,20 @@
-global.casper = require('casper').create({
+casper = require('casper').create({
         verbose: true,
         logLevel: 'warning',
         pageSettings: {
-             loadImages:  false,         // The WebPage instance used by Casper will
+             loadImages:  true,         // The WebPage instance used by Casper will
              loadPlugins: false,         // use these settings
              userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_5) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4'
+        },
+        options: {
+            waitTimeout: 20000
         }
     }),
     target = require('./input').target,
     stackshare_mod = require('./scraper_modules/stackshare'),
     siftery_mod = require('./scraper_modules/siftery');
 
-global.struct = {};
+struct = {};
 
 casper.on('error', function(msg, backtrace) {
   this.echo("=========================");
@@ -37,12 +40,19 @@ casper.on('remote.message', function(msg) {
 casper.start().then(function() {
     var fs = require('fs');
     this.echo('Starting Mister Sifter... o<[0~_~0]>o');
+    struct.target = target.name;
+    struct.clients = [];
+
+    var file = struct.target + '.csv';
+
+    if (fs.isFile(file)) {
+        console.log(file, ' already exists. Removing it...');
+        fs.remove(file);
+    }
 });
 
 //Stackshare pipe
 casper.then(function() {
-    struct.target = target.name;
-    struct.clients = [];
     console.log('Starting stackshare pipe');
     stackshare_mod(target.stackshare);
 });
