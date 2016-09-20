@@ -108,11 +108,11 @@ var writeToCSV = function(client, softwares) {
             string = string + ', ' + software + ' [ ' + section + ' ]';
         });
     });
+    string += '\n';
 
     fs.write(filename, string, 'a');
 };
 
-//This is causing a crash
 var scrapeClient = function() {
     var ret = [];
 
