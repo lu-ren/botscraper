@@ -7,7 +7,7 @@ casper = require('casper').create({
              userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_5) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4'
         },
         options: {
-            waitTimeout: 20000
+            waitTimeout: 10000
         }
     }),
     target = require('./input').target,
@@ -15,6 +15,8 @@ casper = require('casper').create({
     siftery_mod = require('./scraper_modules/siftery');
 
 struct = {};
+
+casper.on('resource.requested', resourceRequested);
 
 casper.on('error', function(msg, backtrace) {
   this.echo("=========================");
@@ -68,3 +70,10 @@ casper.run(function() {
     this.echo('Mister Sifter bids you goodbye...0<[0~_~0]>0');
     this.exit();
 });
+
+//Suppresses image requests...workaround for load-images memory leak
+function resourceRequested(requestData, request) {
+    if (requestData.url.match(/\.(jpeg|jpg|gif|png|tif|tiff|mov)$/)) {
+        request.abort();
+    }
+};
