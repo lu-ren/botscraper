@@ -4,6 +4,9 @@ var sites = {
     },
     siftery: {
         baseUrl: 'http://siftery.com'
+    },
+    mattermark: {
+        baseUrl: 'https://mattermark.com'
     }
 };
 

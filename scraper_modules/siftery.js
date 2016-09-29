@@ -78,6 +78,7 @@ var scrape = function() {
 
                             self.waitForSelector('.products-bucket', function() {
                                 var softwares = self.evaluate(scrapeClient);
+                                //Need to scrape from mattermark here
                                 writeToCSV(client, softwares);
                             }, function() {
                                 console.log('Unable to scrape', clientUrl);
